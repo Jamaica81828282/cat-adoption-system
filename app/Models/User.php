@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPassword;
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+    // In app/Models/User.php
+// Add this method inside your User model class
+ 
+public function applications()
+{
+    return $this->hasMany(Application::class);
+}
+public function sendPasswordResetNotification($token)
+{
+    // Generate a 6-digit OTP
+    $otp = rand(100000, 999999);
+    
+    // Store OTP in cache for verification (expires in 10 minutes)
+    cache()->put('password_reset_otp_' . $this->email, $otp, now()->addMinutes(10));
+    
+    // Send notification with BOTH token and OTP
+    $this->notify(new ResetPassword($token, $otp));
+}
+}
