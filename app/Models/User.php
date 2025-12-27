@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',  // ← ADD THIS LINE
     ];
 
     /**
@@ -46,22 +47,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    // In app/Models/User.php
-// Add this method inside your User model class
- 
-public function applications()
-{
-    return $this->hasMany(Application::class);
-}
-public function sendPasswordResetNotification($token)
-{
-    // Generate a 6-digit OTP
-    $otp = rand(100000, 999999);
-    
-    // Store OTP in cache for verification (expires in 10 minutes)
-    cache()->put('password_reset_otp_' . $this->email, $otp, now()->addMinutes(10));
-    
-    // Send notification with BOTH token and OTP
-    $this->notify(new ResetPassword($token, $otp));
-}
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        // Generate a 6-digit OTP
+        $otp = rand(100000, 999999);
+        
+        // Store OTP in cache for verification (expires in 10 minutes)
+        cache()->put('password_reset_otp_' . $this->email, $otp, now()->addMinutes(10));
+        
+        // Send notification with BOTH token and OTP
+        $this->notify(new ResetPassword($token, $otp));
+    }
 }
