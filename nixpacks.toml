@@ -7,5 +7,8 @@ cmds = ["composer install --no-dev --optimize-autoloader", "npm ci"]
 [phases.build]
 cmds = ["npm run build"]
 
+[phases.deploy]
+cmds = ["php artisan db:seed --class=AdminSeeder --force"]
+
 [start]
 cmd = "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
