@@ -28,6 +28,10 @@ Route::patch('/admin/cats/{id}/status', [CatController::class, 'updateStatus'])
     }
     return "User not found";
 });
+Route::get('/view-users', function() {
+    $users = \App\Models\User::all();
+    return response()->json($users);
+});
 
 // ==============================
 // Public Routes
