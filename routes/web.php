@@ -17,16 +17,20 @@ Route::get('/password/verify-otp', [NewPasswordController::class, 'showOtpForm']
 Route::post('/password/verify-otp', [NewPasswordController::class, 'verifyOtp'])
     ->name('password.verify-otp');
  
-Route::patch('/admin/cats/{id}/status', [CatController::class, 'updateStatus'])
-     ->name('admin.cats.updateStatus');
-     Route::get('/make-me-admin/{email}', function($email) {
-    $user = \App\Models\User::where('email', $email)->first();
-    if ($user) {
-        $user->is_admin = true;
-        $user->save();
-        return "User {$email} is now an admin!";
+Route::get('/force-create-admin', function() {
+    try {
+        $user = \App\Models\User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Admin',
+                'password' => \Hash::make('123456789'),
+                'is_admin' => 1,
+            ]
+        );
+        return "Admin created/updated! Email: admin@gmail.com, Password: 123456789, is_admin: " . $user->is_admin;
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
     }
-    return "User not found";
 });
 Route::get('/view-users', function() {
     $users = \App\Models\User::all();
